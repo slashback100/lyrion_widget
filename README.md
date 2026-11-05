@@ -7,7 +7,7 @@ Fonctionnalités :
 - App : affichage now‑playing, mêmes contrôles, choix du serveur et du lecteur.
 
 Préconfiguré avec tes valeurs :
-- Serveur : `http://lytion_host:9000`
+- Serveur : `http://lyrion_host:9000`
 - Lecteurs : Salon, Terrasse bas, Chambre, Terrasse haut / Billard.
 
 ## Structure
@@ -20,7 +20,7 @@ Préconfiguré avec tes valeurs :
 
 ## Accès réseau
 
-L'URL par défaut est `http://lytion_host:9000` (réseau local). Les `Info.plist` autorisent le HTTP local (`NSAppTransportSecurity` + `NSLocalNetworkUsageDescription`). Pour l'utiliser hors de chez toi, il faut exposer Lyrion de façon sécurisée (HTTPS/VPN) et changer l'URL du serveur dans le widget/l'app.
+L'URL par défaut est `http://lyrion_host:9000` (réseau local). Les `Info.plist` autorisent le HTTP local (`NSAppTransportSecurity` + `NSLocalNetworkUsageDescription`). Pour l'utiliser hors de chez toi, il faut exposer Lyrion de façon sécurisée (HTTPS/VPN) et changer l'URL du serveur dans le widget/l'app.
 
 ## Commandes envoyées (JSON-RPC Lyrion)
 
