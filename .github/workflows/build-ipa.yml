@@ -1,0 +1,60 @@
+name: Build Lyrion widget IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build unsigned app
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project LyrionRemote.xcodeproj \
+            -scheme LyrionRemote \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          APP="build/Build/Products/Release-iphoneos/LyrionRemote.app"
+          EXT="build/Build/Products/Release-iphoneos/LyrionWidget.appex"
+          test -d "$APP"
+
+          mkdir -p "$APP/PlugIns"
+          if [ ! -d "$APP/PlugIns/LyrionWidget.appex" ] && [ -d "$EXT" ]; then
+            cp -R "$EXT" "$APP/PlugIns/"
+          fi
+
+          rm -rf Payload LyrionRemote-unsigned.ipa
+          mkdir Payload
+          cp -R "$APP" Payload/
+          zip -qr LyrionRemote-unsigned.ipa Payload
+
+          echo "=== contenu de l'IPA ==="
+          find Payload -maxdepth 4 -type d
+          unzip -l LyrionRemote-unsigned.ipa | head -40
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: LyrionRemote-unsigned-ipa
+          path: LyrionRemote-unsigned.ipa
