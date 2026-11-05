@@ -8,6 +8,8 @@ struct ContentView: View {
     @State private var status: LyrionStatus?
     @State private var artwork: Data?
     @State private var errorMessage: String?
+    @State private var volume: Double = 30
+    @State private var isAdjustingVolume = false
 
     private var client: LyrionClient {
         LyrionClient(server: server, playerID: playerID)
@@ -31,6 +33,7 @@ struct ContentView: View {
                 VStack(spacing: 22) {
                     nowPlaying
                     controls
+                    volumeControl
                     Divider()
                     settings
                     Text("Le widget se configure séparément : appui long sur le widget, puis « Modifier le widget ».")
@@ -109,6 +112,37 @@ struct ContentView: View {
         }
     }
 
+    private var volumeControl: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Volume")
+                    .font(.headline)
+                Spacer()
+                Text("\(Int(volume.rounded()))%")
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 12) {
+                Image(systemName: "speaker.fill")
+                    .foregroundStyle(.secondary)
+                Slider(
+                    value: $volume,
+                    in: 0...100,
+                    step: 1
+                ) { editing in
+                    isAdjustingVolume = editing
+                    if !editing {
+                        Task { await applyVolume() }
+                    }
+                }
+                Image(systemName: "speaker.wave.3.fill")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     private func controlButton(_ symbol: String, command: String, large: Bool = false) -> some View {
         Button {
             Task { await perform(command) }
@@ -155,10 +189,27 @@ struct ContentView: View {
     }
 
     @MainActor
+    private func applyVolume() async {
+        do {
+            try await client.setVolume(Int(volume.rounded()))
+            if var status {
+                status.volume = Int(volume.rounded())
+                self.status = status
+            }
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
     private func refresh() async {
         do {
             let newStatus = try await client.status()
             status = newStatus
+            if !isAdjustingVolume {
+                volume = Double(newStatus.volume)
+            }
             artwork = await client.artworkData(for: newStatus)
             errorMessage = nil
         } catch {

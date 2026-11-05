@@ -4,7 +4,7 @@ Projet iOS (SwiftUI + WidgetKit) inspiré d'iPeng pour piloter un serveur **Lyri
 
 Fonctionnalités :
 - Widget interactif (moyen/grand) : pochette, titre, artiste, état, et 5 boutons **précédent / play / pause / suivant / mute**.
-- App : affichage now‑playing, mêmes contrôles, choix du serveur et du lecteur.
+- App : affichage now‑playing, contrôles lecture, réglage du volume, choix du serveur et du lecteur.
 
 Préconfiguré avec tes valeurs :
 - Serveur : `http://lyrion_host:9000`
@@ -24,11 +24,12 @@ L'URL par défaut est `http://lyrion_host:9000` (réseau local). Les `Info.plist
 
 ## Commandes envoyées (JSON-RPC Lyrion)
 
-Identiques à celles observées dans iPeng :
+Identiques à celles observées dans iPeng (lecture) :
 - Play : `["play"]`
 - Pause : `["pause", 1]`
 - Suivant : `["button", "jump_fwd"]`
 - Précédent : `["button", "jump_rew"]`
 - Mute : `["mixer", "muting", "toggle"]`
+- Volume (app) : `["mixer", "volume", N]` (0–100)
 
 Personnalisation : édite `Shared/LyrionConfig.swift` (serveur par défaut, lecteurs connus).

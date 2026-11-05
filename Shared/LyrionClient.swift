@@ -105,6 +105,11 @@ struct LyrionClient {
         }
     }
 
+    func setVolume(_ value: Int) async throws {
+        let clamped = min(max(value, 0), 100)
+        try await send(["mixer", "volume", clamped])
+    }
+
     func status() async throws -> LyrionStatus {
         guard let url = rpcURL else { throw LyrionError.invalidServer }
 
